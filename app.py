@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+# from quart import Quart
 import requests 
 from bs4 import BeautifulSoup
 import json
@@ -6,8 +7,25 @@ from pprint import pprint
 from flask_cors import CORS
 import re
 
+# app = Quart(__name__)
 app = Flask(__name__)
 CORS(app)
+def jadwal_to_json(data):
+    data_jadwal = []
+    temp = []
+    i=0
+    for data in data:
+        i=i+1
+        temp = {
+            "id": i,
+            "makul" : (re.findall('>\s\W(.*?)<', str(data)))[0].strip(), 
+            "ruang" : (re.findall('[0-9]<br/>(.+[0-9A-Z].\w+)', str(data))),
+            "kelompok" : (re.findall('([A-Z][0-9]+.[0-9]+)', str(data)))[0],
+            "link": data['href']
+        }
+        data_jadwal.append(temp)     
+    return data_jadwal
+
 class Jadwal:
     def __init__(self, hari, sesi):
         self.hari = hari
@@ -30,12 +48,13 @@ class Jadwal:
         return kuliah
 
 # data = Jadwal("selasa","07.00-08.40")
-# kuliah = data.jadwal()
+# kuliah =  data.jadwal()
 # for i in kuliah:
 #     makul = re.findall('>\s\W(.*?)<', str(i))
+#     link = i['href']
 #     kelas = re.findall('([A-Z][0-9]+.[0-9]+)', str(i))    
 #     ruang = re.findall('[0-9]<br/>(.+[0-9A-Z].\w+)', str(i))
-#     print(makul[0].strip())
+#     print(makul)
 #     print(ruang)
 #     print(kelas[0])
 #     print("Makul : {0}, ruang : {1}".format(makul[0].strip(), ruang))
@@ -48,26 +67,18 @@ def home():
 
 @app.route('/<hari>/<sesi>')
 def jadwal_get(hari, sesi):
-    data = Jadwal(hari,sesi)
+    data =  Jadwal(hari,sesi)
     kuliah = data.jadwal()
-    data_jadwal = []
-    temp = []
-    for i in kuliah:
-        temp = {
-            "makul" : (re.findall('>\s\W(.*?)<', str(i)))[0].strip(), 
-            "ruang" : (re.findall('[0-9]<br/>(.+[0-9A-Z].\w+)', str(i))),
-            "kelompok" : (re.findall('([A-Z][0-9]+.[0-9]+)', str(i)))[0]
-        }
-        data_jadwal.append(temp)     
-        
+    data_jadwal = jadwal_to_json(kuliah)
     return jsonify(data_jadwal)
 
 @app.route('/jadwal', methods=["POST"])
 def jadwal_post():
-    hari = request.form['hari']
-    sesi = request.form['sesi']
-    data = Jadwal(hari,sesi)
-    return jsonify(data.jadwal())
+    content = request.json
+    data = Jadwal(content['hari'],content['sesi'])
+    kuliah = data.jadwal()
+    data_jadwal = jadwal_to_json(kuliah)     
+    return jsonify(data_jadwal)
 
 @app.route('/mahasiswa/<nim>')
 def mahasiswa(nim):
