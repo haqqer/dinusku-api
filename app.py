@@ -10,6 +10,7 @@ import re
 # app = Quart(__name__)
 app = Flask(__name__)
 CORS(app)
+
 def jadwal_to_json(data):
     data_jadwal = []
     temp = []
@@ -42,24 +43,9 @@ class Jadwal:
         title = soup.findAll('div', class_='col-md-3')
         kuliah = []
         for i in title:
-            # makul_pattern = re.compile(r'^([A-Z]{1}.+?)(?:|)', flags=re.M)
             temp = i.find('a')
             kuliah.append(temp)
         return kuliah
-
-# data = Jadwal("selasa","07.00-08.40")
-# kuliah =  data.jadwal()
-# for i in kuliah:
-#     makul = re.findall('>\s\W(.*?)<', str(i))
-#     link = i['href']
-#     kelas = re.findall('([A-Z][0-9]+.[0-9]+)', str(i))    
-#     ruang = re.findall('[0-9]<br/>(.+[0-9A-Z].\w+)', str(i))
-#     print(makul)
-#     print(ruang)
-#     print(kelas[0])
-#     print("Makul : {0}, ruang : {1}".format(makul[0].strip(), ruang))
-# data = requests.get('http://dinus.ac.id/androk/wismilak/slim/krs/A11.2017.10418')
-# pprint(data.text[1:-2])
 
 @app.route('/')
 def home():
@@ -72,20 +58,6 @@ def jadwal_get(hari, sesi):
     data_jadwal = jadwal_to_json(kuliah)
     return jsonify(data_jadwal)
 
-@app.route('/jadwal', methods=["POST"])
-def jadwal_post():
-    content = request.json
-    data = Jadwal(content['hari'],content['sesi'])
-    kuliah = data.jadwal()
-    data_jadwal = jadwal_to_json(kuliah)     
-    return jsonify(data_jadwal)
-
-@app.route('/mahasiswa/<nim>')
-def mahasiswa(nim):
-    url =  requests.get('http://dinus.ac.id/androk/wismilak/slim/mahasiswa/{}'.format(nim))
-    data = url.text[2:-2]
-    type(data)
-    return data
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0")
