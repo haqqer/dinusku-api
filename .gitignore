@@ -1,10 +1,2 @@
-<<<<<<< HEAD
 /__pycache__
 *.pyc
-=======
-#Folder
-__pycache__
-
-#file
-test.py
->>>>>>> origin/master
