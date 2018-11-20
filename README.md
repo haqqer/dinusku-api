@@ -1,5 +1,4 @@
-
-# API DINUSKU
-===============
+API DINUSKU
+===========
 |Build Status|
 ## ENDPOINTS
