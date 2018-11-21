@@ -1,7 +1,5 @@
 import pytest
 import requests
-import app
-
 
 def test_url():
     url = requests.get('https://dinus-api.herokuapp.com')
