@@ -11,6 +11,7 @@ class Config(object):
 class Development(Config):
     ''' Configuration for development '''
     DEBUG = True
+    CORS_ENABLED = True
 
 class Testing(Config):
     TESTING = True
