@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 api_bp = Blueprint('api', __name__)
 api = Api(api_bp)
-CORS(api)
+CORS(api_bp)
 
 class Hello(Resource):
     def get(self):
